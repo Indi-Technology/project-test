@@ -49,9 +49,8 @@ class CompanyService
                     'password' => Hash::make($request->password),
                     'role' => 'company',
                 ]);
-    
-                $company = Company::create([
-                    'user_id' => $user->id,
+
+                $company = $user->companies()->create([
                     'description' => $request->description,
                     'logo' => $request->logo,
                 ]);
