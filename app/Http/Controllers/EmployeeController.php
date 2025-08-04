@@ -110,7 +110,11 @@ class EmployeeController extends Controller
 
 	public function destroy(Employee $employee)
 	{
-		$employee->delete();
-		return redirect()->route('employees')->with('success', 'Employee deleted successfully.');
+		try {
+			$employee->delete();
+			return redirect()->route('employees')->with('success', 'Employee deleted successfully.');
+		} catch (\Exception $e) {
+			return redirect()->route('employees')->with('error', 'Failed to delete employee.' . $e->getMessage());
+		}
 	}
 }

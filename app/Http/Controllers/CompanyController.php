@@ -5,8 +5,9 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Illuminate\Validation\ValidationException;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Validation\ValidationException;
 
 class CompanyController extends Controller
 {
@@ -125,13 +126,23 @@ class CompanyController extends Controller
 
 	public function destroy(Company $company)
 	{
-		if ($company->logo) {
-			Storage::disk('public')->delete($company->logo);
+		try {
+			DB::transaction(function () use ($company) {
+				if ($company->logo) {
+					Storage::disk('public')->delete($company->logo);
+				}
+
+				$company->employees()->each(function ($employee) {
+					$employee->delete();
+				});
+
+				$company->delete();
+			});
+
+			return redirect()->route('companies')->with('success', 'Company deleted successfully.');
+		} catch (\Exception $e) {
+			return redirect()->route('companies')->with('error', 'Failed to delete company: ' . $e->getMessage());
 		}
-
-		$company->delete();
-
-		return redirect()->route('companies')->with('success', 'Company deleted successfully.');
 	}
 
 	public function removeLogo(Company $company)
