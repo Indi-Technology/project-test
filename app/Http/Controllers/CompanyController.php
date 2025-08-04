@@ -52,6 +52,8 @@ class CompanyController extends Controller
     public function show($id)
     {
         // Logic to display a specific company
+        $company = $this->companyService->getCompanyById($id);
+        return view('show-company', compact('company'));
     }
 
     /**

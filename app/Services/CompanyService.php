@@ -13,14 +13,34 @@ class CompanyService
      */
     public function getAllCompanies()
     {
-        // Eager loading untuk menghindari N+1 query
-        $companies = Company::with(['user', 'employees.user'])->get();
+        $companies = Company::with([
+            'user:id,name', 
+            'employees:id,company_id,phone,logo', 
+            'employees.user:id,name'
+        ])
+        ->select('id', 'user_id', 'description', 'logo')
+        ->get()
+        ->map(function ($company) {
+            return [
+                'id' => $company->id,
+                'name' => $company->user->name,
+                'description' => $company->description,
+                'logo' => $company->logo,
+                'employees' => $company->employees->map(function ($employee) {
+                    return [
+                        'name' => $employee->user->name,
+                        'phone' => $employee->phone,
+                        'logo' => $employee->logo
+                    ];
+                })
+            ];
+        });
+        
         return $companies;
     }
 
     public function createCompany($request)
     {
-        // Logic to create a new company
         try {
             return DB::transaction(function () use ($request) {
                 $user = User::create([
@@ -36,7 +56,6 @@ class CompanyService
                     'logo' => $request->logo,
                 ]);
 
-                // Return company dengan detail name saja
                 return [
                     'name' => $user->name,
                     'message' => 'Company created successfully'
@@ -48,6 +67,31 @@ class CompanyService
                 'error' => 'Failed to create company: ' . $e->getMessage()
             ];
         }
+    }
+
+    public function getCompanyById(string $id)
+    {
+        $company = Company::with([
+            'user:id,name',
+            'employees:id,company_id,phone,logo',
+            'employees.user:id,name'
+        ])
+        ->select('id', 'user_id', 'description', 'logo')
+        ->findOrFail($id);
+
+        return [
+            'id' => $company->id,
+            'name' => $company->user->name,
+            'description' => $company->description,
+            'logo' => $company->logo,
+            'employees' => $company->employees->map(function ($employee) {
+                return [
+                    'name' => $employee->user->name,
+                    'phone' => $employee->phone,
+                    'logo' => $employee->logo
+                ];
+            })
+        ];
     }
 
     public function updateCompany(int $id, array $data)
