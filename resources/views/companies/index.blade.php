@@ -65,7 +65,7 @@
                                     <form action="{{ route('companies.delete', $company->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" onclick="return confirm('Are you sure?')" class="text-red-600 hover:text-red-900">Delete</button>
+                                        <button type="submit" onclick="return confirm('Are you sure?, this action will delete all employees of this company')" class="text-red-600 hover:text-red-900">Delete</button>
                                     </form>
                                 </td>
                             </tr>
