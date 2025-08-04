@@ -1,12 +1,13 @@
 <?php
 
 namespace App\Services;
-use App\Models\Company;
+
+use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class EmployeeService 
+class EmployeeService
 {
     /**
      * Logic to handle employee-related operations.
@@ -41,10 +42,13 @@ class EmployeeService
         return $employees;
     }
 
-    public function createEmployee($request, string $companyId)
+    /**
+     * Create new employee
+     */
+    public function createEmployee($request)
     {
         try {
-            return DB::transaction(function () use ($request, $companyId) {
+            return DB::transaction(function () use ($request) {
                 $user = User::create([
                     'name' => $request->name,
                     'email' => $request->email,
@@ -54,49 +58,39 @@ class EmployeeService
 
                 $employee = Employee::create([
                     'user_id' => $user->id,
-                    'company_id' => $companyId,
+                    'company_id' => $request->company_id,
                     'phone' => $request->phone,
                     'logo' => $request->logo,
                 ]);
 
-                return $employee;
+                return [
+                    'name' => $user->name,
+                    'message' => 'Employee created successfully'
+                ];
             });
         } catch (\Exception $e) {
-            // Handle exception
-            throw new \Exception('Error creating employee: ' . $e->getMessage());
+            return [
+                'error' => 'Failed to create employee: ' . $e->getMessage()
+            ];
         }
     }
 
-    public function updateEmployee($request, string $employeeId)
+    /**
+     * Get employee by ID
+     */
+    public function getEmployeeById($id)
     {
-        try {
-            return DB::transaction(function () use ($request, $employeeId) {
-                $employee = Employee::findOrFail($employeeId);
-                $employee->update([
-                    'phone' => $request->phone,
-                    'logo' => $request->logo,
-                ]);
+        $employee = Employee::with(['user:id,name,email', 'company.user:id,name'])
+            ->findOrFail($id);
 
-                return $employee;
-            });
-        } catch (\Exception $e) {
-            // Handle exception
-            throw new \Exception('Error updating employee: ' . $e->getMessage());
-        }
-    }
-
-    public function deleteEmployee(string $employeeId)
-    {
-        try {
-            return DB::transaction(function () use ($employeeId) {
-                $employee = Employee::findOrFail($employeeId);
-                $employee->delete();
-
-                return $employee;
-            });
-        } catch (\Exception $e) {
-            // Handle exception
-            throw new \Exception('Error deleting employee: ' . $e->getMessage());
-        }
+        return [
+            'id' => $employee->id,
+            'name' => $employee->user->name,
+            'email' => $employee->user->email,
+            'phone' => $employee->phone,
+            'logo' => $employee->logo,
+            'company_name' => $employee->company->user->name ?? 'No Company',
+            'company_id' => $employee->company_id
+        ];
     }
 }

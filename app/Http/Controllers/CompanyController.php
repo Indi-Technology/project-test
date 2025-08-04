@@ -51,6 +51,7 @@ class CompanyController extends Controller
     public function show($id)
     {
         $company = $this->companyService->getCompanyById($id);
+        
         return view('show-company', compact('company'));
     }
 
@@ -60,6 +61,7 @@ class CompanyController extends Controller
     public function edit($id)
     {
         $company = $this->companyService->getCompanyById($id);
+
         return view('edit-company', compact('company'));
     }
 

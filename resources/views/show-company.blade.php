@@ -3,7 +3,20 @@
 <head>
     <title>Company Details</title>
     <style>
-        
+        /* ...existing styles... */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        .btn-success {
+            background-color: #28a745;
+            color: white;
+        }
+        .btn-success:hover {
+            background-color: #218838;
+        }
     </style>
 </head>
 <body>
@@ -12,24 +25,19 @@
             <a href="{{ route('companies.index') }}">&larr; Back to Companies List</a>
         </div>
 
-        <div class="company-header flex justify-center items-center bg-blue-500 p-4">
+        <div class="company-header">
             @if($company['logo'])
                 <img src="{{ asset('storage/' . $company['logo']) }}" alt="Company Logo" class="company-logo">
             @endif
-            <h1 class="company-name text-white">{{ $company['name'] ?? 'No Name' }}</h1>
+            <h1 class="company-name">{{ $company['name'] ?? 'No Name' }}</h1>
         </div>
 
-        <div class="info-section flex justify-center items-center">
+        <div class="info-section">
             <h2 class="info-title">Company Information</h2>
             
             <div class="info-item">
                 <span class="info-label">Company Name:</span>
                 <span class="info-value">{{ $company['name'] ?? 'No Name' }}</span>
-            </div>
-            
-            <div class="info-item">
-                <span class="info-label">Email:</span>
-                <span class="info-value">{{ $company['email'] ?? 'No Email' }}</span>
             </div>
             
             <div class="info-item">
@@ -44,25 +52,31 @@
         </div>
 
         <div class="info-section">
-            <h2 class="info-title">Employees</h2>
+            <div class="section-header">
+                <h2 class="info-title">Employees</h2>
+                <a href="{{ route('employees.create', ['company_id' => $company['id']]) }}" class="btn btn-success">+ Add Employee</a>
+            </div>
             
             @if(count($company['employees']) > 0)
                 <ul class="employees-list">
                     @foreach($company['employees'] as $employee)
                         <li class="employee-item">
-                            <div class="employee-name">{{ $employee['user']['name'] ?? 'No Name' }}</div>
-                            <div class="employee-email">{{ $employee['user']['email'] ?? 'No Email' }}</div>
+                            <div class="employee-name">{{ $employee['name'] ?? 'No Name' }}</div>
+                            <div class="employee-email">Phone: {{ $employee['phone'] ?? 'No Phone' }}</div>
                         </li>
                     @endforeach
                 </ul>
             @else
                 <p class="no-data">No employees found for this company.</p>
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="{{ route('employees.create', ['company_id' => $company['id']]) }}" class="btn btn-success">Add First Employee</a>
+                </div>
             @endif
         </div>
 
         <div class="actions">
             <a href="{{ route('companies.edit', $company['id']) }}" class="btn btn-primary">Edit Company</a>
-
+            
             <form action="{{ route('companies.destroy', $company['id']) }}" method="POST" style="display: inline;" 
                   onsubmit="return confirm('Are you sure you want to delete this company?')">
                 @csrf
