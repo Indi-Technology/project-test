@@ -29,13 +29,7 @@ class CompanyService
                 'name' => $company->user->name,
                 'description' => $company->description,
                 'logo' => $company->logo,
-                'employees' => $company->employees->map(function ($employee) {
-                    return [
-                        'name' => $employee->user->name,
-                        'phone' => $employee->phone,
-                        'logo' => $employee->logo
-                    ];
-                })
+                'employees_count' => $company->employees->count(), // Hanya count, bukan list lengkap
             ];
         });
         
@@ -73,13 +67,9 @@ class CompanyService
 
     public function getCompanyById(string $id)
     {
-        $company = Company::with([
-            'user:id,name,email',
-            'employees:user_id,company_id,phone,logo',
-            'employees.user:id,name'
-        ])
-        ->select('user_id', 'description', 'logo')
-        ->findOrFail($id);
+        $company = Company::with('user:id,name,email')
+            ->select('user_id', 'description', 'logo')
+            ->findOrFail($id);
 
         return [
             'id' => $company->user_id,
@@ -87,13 +77,40 @@ class CompanyService
             'email' => $company->user->email,
             'description' => $company->description,
             'logo' => $company->logo,
-            'employees' => $company->employees->map(function ($employee) {
-                return [
-                    'name' => $employee->user->name,
-                    'phone' => $employee->phone,
-                    'logo' => $employee->logo
-                ];
-            })
+        ];
+    }
+
+    public function getCompanyWithEmployees(string $id, int $perPage = 10)
+    {
+        $company = Company::with('user:id,name,email')
+            ->select('user_id', 'description', 'logo')
+            ->findOrFail($id);
+
+        // Pagination untuk employees
+        $employees = $company->employees()
+            ->with('user:id,name')
+            ->select('user_id', 'company_id', 'phone', 'logo')
+            ->paginate($perPage);
+
+        // Transform employees data
+        $employees->getCollection()->transform(function ($employee) {
+            return [
+                'id' => $employee->user_id,
+                'name' => $employee->user->name,
+                'phone' => $employee->phone,
+                'logo' => $employee->logo
+            ];
+        });
+
+        return [
+            'company' => [
+                'id' => $company->user_id,
+                'name' => $company->user->name,
+                'email' => $company->user->email,
+                'description' => $company->description,
+                'logo' => $company->logo,
+            ],
+            'employees' => $employees
         ];
     }
 
@@ -101,16 +118,24 @@ class CompanyService
     {
         try {
             return DB::transaction(function () use ($id, $data) {
-                $company = Company::findOrFail($id);
-                $company->update($data);
+                $company = Company::where('user_id', $id)->firstOrFail();
+                
+                // Update company data
+                $company->update([
+                    'description' => $data['description'] ?? $company->description,
+                    'logo' => $data['logo'] ?? $company->logo,
+                ]);
+
+                // Update user data jika ada
+                if (isset($data['name'])) {
+                    $company->user->update(['name' => $data['name']]);
+                }
 
                 return [
-                    'name' => $company->user->name,
                     'message' => 'Company updated successfully'
                 ];
             });
         } catch (\Exception $e) {
-            // Handle the exception
             return [
                 'error' => 'Failed to update company: ' . $e->getMessage()
             ];
@@ -121,16 +146,22 @@ class CompanyService
     {
         try {
             return DB::transaction(function () use ($id) {
-                $company = Company::findOrFail($id);
+                $company = Company::where('user_id', $id)->firstOrFail();
+                
+                // Delete all employees first
+                $company->employees()->delete();
+                
+                // Delete company
                 $company->delete();
+                
+                // Delete user
+                $company->user->delete();
 
                 return [
-                    'name' => $company->user->name,
                     'message' => 'Company deleted successfully'
                 ];
             });
         } catch (\Exception $e) {
-            // Handle the exception
             return [
                 'error' => 'Failed to delete company: ' . $e->getMessage()
             ];
