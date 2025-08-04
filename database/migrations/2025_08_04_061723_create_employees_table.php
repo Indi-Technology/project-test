@@ -12,7 +12,9 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
+            $table->uuid('user_id');
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->uuid('company_id');
             $table->foreign('company_id')->references('user_id')->on('companies')->onDelete('cascade');
             $table->string('phone');
             $table->string('logo')->nullable();
