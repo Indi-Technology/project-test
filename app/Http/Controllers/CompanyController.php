@@ -81,6 +81,12 @@ class CompanyController extends Controller
      */
     public function destroy($id)
     {
-        // Logic to delete a specific company
+        $result = $this->companyService->deleteCompany($id);
+
+        if (isset($result['error'])) {
+            return redirect()->back()->withErrors($result['error']);
+        }
+
+        return redirect()->route('companies.index')->with('success', 'Company deleted successfully');
     }
 }

@@ -114,8 +114,23 @@ class CompanyService
         }
     }
 
-    public function deleteCompany(int $id)
+    public function deleteCompany(string $id)
     {
-        // Logic to delete a company
+        try {
+            return DB::transaction(function () use ($id) {
+                $company = Company::findOrFail($id);
+                $company->delete();
+
+                return [
+                    'name' => $company->user->name,
+                    'message' => 'Company deleted successfully'
+                ];
+            });
+        } catch (\Exception $e) {
+            // Handle the exception
+            return [
+                'error' => 'Failed to delete company: ' . $e->getMessage()
+            ];
+        }
     }
 }
