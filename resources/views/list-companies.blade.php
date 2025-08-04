@@ -8,9 +8,10 @@
     
     @forelse($companies as $company)
         <div class="company-card">
-            <h3>{{ $company->name }}</h3>
-            <p><strong>Owner:</strong> {{ $company->user->name ?? 'No Owner' }}</p>
-            <p><strong>Total Employees:</strong> {{ $company->employees->count() }}</p>
+            <h3>{{ $company['name'] }}</h3>
+            <p><strong>ID:</strong> {{ $company['id'] }}</p>
+            <p><strong>Description:</strong> {{ $company['description'] }}</p>
+            <p><strong>Total Employees:</strong> {{ count($company['employees']) }}</p>
         </div>
     @empty
         <p>No companies available.</p>

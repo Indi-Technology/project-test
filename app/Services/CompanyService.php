@@ -15,7 +15,7 @@ class CompanyService
     {
         $companies = Company::with([
             'user:id,name', 
-            'employees:id,company_id,phone,logo', 
+            'employees:user_id,company_id,phone,logo', 
             'employees.user:id,name'
         ])
         ->select('user_id', 'description', 'logo')
@@ -72,7 +72,7 @@ class CompanyService
     {
         $company = Company::with([
             'user:id,name',
-            'employees:id,company_id,phone,logo',
+            'employees:user_id,company_id,phone,logo',
             'employees.user:id,name'
         ])
         ->select('user_id', 'description', 'logo')
