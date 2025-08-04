@@ -25,8 +25,8 @@ class EmployeeController extends Controller
             abort(403, 'You can only view your own employees.');
         }
 
-        $employees = $this->employeeService->getEmployeesByCompany($companyId);
-        return view('list-employees', compact('employees', 'companyId'));
+        // $employees = $this->employeeService->getEmployeesByCompany($companyId);
+        // return view('list-employees', compact('employees', 'companyId'));
     }
 
     /**

@@ -308,15 +308,13 @@
         <div class="actions">
             @if(Auth::user()->role === 'admin')
                 <a href="{{ route('companies.edit', $company['id']) }}" class="btn btn-primary">Edit Company</a>
-                
+            
                 <form action="{{ route('companies.destroy', $company['id']) }}" method="POST" style="display: inline;" 
                       onsubmit="return confirm('Are you sure you want to delete this company?')">
                     @csrf
                     @method('DELETE')
                     <button type="submit" class="btn btn-danger">Delete Company</button>
                 </form>
-            @elseif(Auth::user()->role === 'company')
-                <a href="{{ route('employees.index', $result['company']['id']) }}" class="btn btn-primary">Manage All Employees</a>
             @endif
         </div>
     </div>

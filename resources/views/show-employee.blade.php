@@ -280,7 +280,7 @@
                     <button type="submit" class="btn btn-danger">Delete Employee</button>
                 </form>
                 
-                <a href="{{ route('employees.index', $companyId) }}" class="btn btn-secondary">View All Employees</a>
+                <a href="{{ route('companies.show', $companyId) }}" class="btn btn-secondary">View All Employees</a>
             @elseif(Auth::user()->role === 'admin')
                 <a href="{{ route('companies.show', $companyId) }}" class="btn btn-primary">Back to Company</a>
             @endif

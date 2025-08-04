@@ -130,4 +130,34 @@ class EmployeeService
             ];
         }
     }
+
+    /**
+     * Delete employee dengan validasi company
+     */
+    public function deleteEmployee($id, $companyId)
+    {
+        try {
+            return DB::transaction(function () use ($id, $companyId) {
+                $employee = Employee::where('user_id', $id)
+                    ->where('company_id', $companyId)
+                    ->firstOrFail();
+
+                if ($employee->logo) {
+                    Storage::disk('public')->delete($employee->logo);
+                }
+
+                $employee->delete();
+                
+                $employee->user->delete();
+
+                return [
+                    'message' => 'Employee deleted successfully'
+                ];
+            });
+        } catch (\Exception $e) {
+            return [
+                'error' => 'Failed to delete employee: ' . $e->getMessage()
+            ];
+        }
+    }
 }
