@@ -11,7 +11,7 @@ class StoreEmployeeRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true;
     }
 
     /**
@@ -22,7 +22,7 @@ class StoreEmployeeRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'company_id' => ['required', 'exists:companies,id'],
+            'company_id' => ['required', 'exists:companies,user_id'],
             'phone'      => ['required', 'string', 'max:15'],
             'logo'       => ['nullable', 'image', 'max:2048'],
         ];

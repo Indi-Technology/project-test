@@ -111,7 +111,7 @@
             @if($companyId)
                 <a href="{{ route('companies.show', $companyId) }}">&larr; Back to Company Details</a>
             @else
-                <a href="{{ route('employees.index') }}">&larr; Back to Employees List</a>
+                <a href="{{ route('employees.index', $companyId) }}">&larr; Back to Employees List</a>
             @endif
         </div>
 
@@ -127,7 +127,7 @@
             </div>
         @endif
 
-        <form action="{{ route('employees.store') }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('employees.store', $companyId) }}" method="POST" enctype="multipart/form-data">
             @csrf
             
             @if($companyId)
@@ -204,7 +204,7 @@
                 @if($companyId)
                     <a href="{{ route('companies.show', $companyId) }}" class="btn btn-secondary">Cancel</a>
                 @else
-                    <a href="{{ route('employees.index') }}" class="btn btn-secondary">Cancel</a>
+                    <a href="{{ route('employees.index', $companyId) }}" class="btn btn-secondary">Cancel</a>
                 @endif
             </div>
         </form>

@@ -3,6 +3,9 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Services\EmployeeService;
+use App\Http\Requests\StoreEmployeeRequest;
+use Illuminate\Support\Facades\Auth;
 
 class EmployeeController extends Controller
 {
@@ -26,15 +29,23 @@ class EmployeeController extends Controller
      */
     public function create()
     {
-        return view('create-employee');
+        return view('create-employee', [
+            'companyId' => Auth::user()->id
+        ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(StoreEmployeeRequest $request)
     {
-        // Logic to store a new employee
+        $employee = $this->employeeService->createEmployee($request);
+
+        if (isset($employee['error'])) {
+            return redirect()->back()->withErrors($employee['error']);
+        }
+
+        return redirect()->route('companies.show', $request->company_id)->with('success', $employee['message']);
     }
 
     /**

@@ -46,26 +46,26 @@ Route::middleware('auth')->group(function () {
 
     // Employee routes - Only for company role
     Route::middleware('company')->group(function () {
-        Route::get('employees', [EmployeeController::class, 'index'])
+        Route::get('companies/{id}/employees', [EmployeeController::class, 'index'])
             ->name('employees.index');
         
-        Route::get('employees/create', [EmployeeController::class, 'create'])
+        Route::get('companies/{id}/employees/create', [EmployeeController::class, 'create'])
             ->name('employees.create');
         
-        Route::post('employees/create', [EmployeeController::class, 'store'])
+        Route::post('companies/{id}/employees/create', [EmployeeController::class, 'store'])
             ->name('employees.store');
         
-        Route::get('employees/{employee}', [EmployeeController::class, 'show'])
+        Route::get('companies/{id}/employees/{employee}', [EmployeeController::class, 'show'])
             ->name('employees.show');
         
-        Route::get('employees/{employee}/edit', [EmployeeController::class, 'edit'])
+        Route::get('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'edit'])
             ->name('employees.edit');
         
-        Route::put('employees/{employee}/edit', [EmployeeController::class, 'update'])
+        Route::put('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'update'])
             ->name('employees.update');
-        Route::patch('employees/{employee}/edit', [EmployeeController::class, 'update']);
+        Route::patch('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'update']);
         
-        Route::delete('employees/{employee}/delete', [EmployeeController::class, 'destroy'])
+        Route::delete('companies/{id}/employees/{employee}/delete', [EmployeeController::class, 'destroy'])
             ->name('employees.destroy');
     });
 });

@@ -239,7 +239,7 @@
             <div class="section-header">
                 <h2 class="info-title">Employees</h2>
                 @if(Auth::user()->role === 'company')
-                    <a href="{{ route('employees.create') }}" class="btn btn-success">+ Add Employee</a>
+                    <a href="{{ route('employees.create', ['id' => $result['company']['id']]) }}" class="btn btn-success">+ Add Employee</a>
                 @endif
             </div>
 
@@ -277,10 +277,10 @@
                                 </td>
                                 <td>
                                     @if(Auth::user()->role === 'company')
-                                        <a href="{{ route('employees.show', $employee['id']) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
-                                        <a href="{{ route('employees.edit', $employee['id']) }}" class="btn btn-success" style="font-size: 12px; padding: 5px 10px;">Edit</a>
+                                        <a href="{{ route('employees.show', ['id' => $result['company']['id'], 'employee' => $employee['id']]) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
+                                        <a href="{{ route('employees.edit', ['id' => $result['company']['id'], 'employee' => $employee['id']]) }}" class="btn btn-success" style="font-size: 12px; padding: 5px 10px;">Edit</a>
                                     @elseif(Auth::user()->role === 'admin')
-                                        <a href="{{ route('employees.show', $employee['id']) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
+                                        <a href="{{ route('employees.show', ['id' => $result['company']['id'], 'employee' => $employee['id']]) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
                                     @endif
                                 </td>
                             </tr>
@@ -297,7 +297,7 @@
                     <p>No employees found for this company.</p>
                     @if(Auth::user()->role === 'company')
                         <div style="margin-top: 20px;">
-                            <a href="{{ route('employees.create') }}" class="btn btn-success">Add First Employee</a>
+                            <a href="{{ route('employees.create', ['id' => $result['company']['id']]) }}" class="btn btn-success">Add First Employee</a>
                         </div>
                     @endif
                 </div>
@@ -316,7 +316,7 @@
                     <button type="submit" class="btn btn-danger">Delete Company</button>
                 </form>
             @elseif(Auth::user()->role === 'company')
-                <a href="{{ route('employees.index') }}" class="btn btn-primary">Manage All Employees</a>
+                <a href="{{ route('employees.index', $result['company']['id']) }}" class="btn btn-primary">Manage All Employees</a>
             @endif
         </div>
     </div>
