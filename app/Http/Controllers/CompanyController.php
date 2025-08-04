@@ -4,8 +4,10 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Http\Requests\CompanyRequest;
+use App\Mail\CompanyWelcomeMail;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Mail;
 
 class CompanyController extends Controller
 {
@@ -36,9 +38,17 @@ class CompanyController extends Controller
       $data['logo'] = $request->file('logo')->store('logos', 'public');
     }
 
-    Company::create($data);
+    $company = Company::create($data);
+    
+    // Kirim email selamat datang ke company
+    try {
+      Mail::to($company->email)->send(new CompanyWelcomeMail($company));
+    } catch (\Exception $e) {
+      \Log::error('Failed to send welcome email to company: ' . $e->getMessage());
+    }
+    
     return redirect()->route('companies.index')
-      ->with('success', 'Company created successfully.');
+      ->with('success', 'Company created successfully and welcome email has been sent.');
   }
 
   /**
