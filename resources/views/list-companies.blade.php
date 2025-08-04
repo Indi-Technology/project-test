@@ -137,7 +137,7 @@
                     <h3 class="company-name">{{ $company['name'] ?? 'No Name' }}</h3>
                     <p class="company-info"><strong>ID:</strong> {{ $company['id'] }}</p>
                     <p class="company-info"><strong>Description:</strong> {{ $company['description'] ?? 'No Description' }}</p>
-                    <p class="company-info"><strong>Total Employees:</strong> {{ count($company['employees']) }}</p>
+                    <p class="company-info"><strong>Total Employees:</strong> {{ $company['employees_count'] }}</p>
                     <a href="{{ route('companies.show', $company['id']) }}" class="view-btn">View Details</a>
                 </div>
             @endforeach

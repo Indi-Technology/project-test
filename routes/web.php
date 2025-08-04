@@ -27,7 +27,7 @@ Route::middleware('auth')->group(function () {
         Route::get('companies', [CompanyController::class, 'index'])
             ->name('companies.index');
         
-        Route::get('companies/create', [CompanyController::class, 'create'])
+        Route::get('companies-create', [CompanyController::class, 'create'])
             ->name('companies.create');
         
         Route::post('companies/create', [CompanyController::class, 'store'])

@@ -279,8 +279,6 @@
                                     @if(Auth::user()->role === 'company')
                                         <a href="{{ route('employees.show', ['id' => $result['company']['id'], 'employeeId' => $employee['id']]) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
                                         <a href="{{ route('employees.edit', ['id' => $result['company']['id'], 'employeeId' => $employee['id']]) }}" class="btn btn-success" style="font-size: 12px; padding: 5px 10px;">Edit</a>
-                                    @elseif(Auth::user()->role === 'admin')
-                                        <a href="{{ route('employees.show', ['id' => $result['company']['id'], 'employeeId' => $employee['id']]) }}" class="btn btn-primary" style="font-size: 12px; padding: 5px 10px;">View</a>
                                     @endif
                                 </td>
                             </tr>

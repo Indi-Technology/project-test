@@ -52,7 +52,12 @@ class CompanyController extends Controller
     {
         $result = $this->companyService->getCompanyWithEmployees($id);
 
-        return view('show-company', compact('result'));
+        return view('show-company', [
+            'result' => $result,
+            'company' => [
+                'id' => $id
+            ]
+        ]);
     }
 
     /**
