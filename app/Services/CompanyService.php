@@ -13,14 +13,17 @@ class CompanyService
      */
     public function getAllCompanies()
     {
+        // Eager loading dengan pagination (10 entries per page)
         $companies = Company::with([
             'user:id,name', 
             'employees:user_id,company_id,phone,logo', 
             'employees.user:id,name'
         ])
         ->select('user_id', 'description', 'logo')
-        ->get()
-        ->map(function ($company) {
+        ->paginate(10); // Menggunakan paginate() instead of get()
+
+        // Transform data menggunakan getCollection() untuk pagination
+        $companies->getCollection()->transform(function ($company) {
             return [
                 'id' => $company->user_id,
                 'name' => $company->user->name,
