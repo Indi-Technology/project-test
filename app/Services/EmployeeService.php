@@ -84,7 +84,7 @@ class EmployeeService
             ->findOrFail($id);
 
         return [
-            'id' => $employee->id,
+            'id' => $employee->user_id,
             'name' => $employee->user->name,
             'email' => $employee->user->email,
             'phone' => $employee->phone,

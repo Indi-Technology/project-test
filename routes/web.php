@@ -55,17 +55,17 @@ Route::middleware('auth')->group(function () {
         Route::post('companies/{id}/employees/create', [EmployeeController::class, 'store'])
             ->name('employees.store');
         
-        Route::get('companies/{id}/employees/{employee}', [EmployeeController::class, 'show'])
+        Route::get('companies/{id}/employees/{employeeId}', [EmployeeController::class, 'show'])
             ->name('employees.show');
         
-        Route::get('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'edit'])
+        Route::get('companies/{id}/employees/{employeeId}/edit', [EmployeeController::class, 'edit'])
             ->name('employees.edit');
         
-        Route::put('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'update'])
+        Route::put('companies/{id}/employees/{employeeId}/edit', [EmployeeController::class, 'update'])
             ->name('employees.update');
-        Route::patch('companies/{id}/employees/{employee}/edit', [EmployeeController::class, 'update']);
+        Route::patch('companies/{id}/employees/{employeeId}/edit', [EmployeeController::class, 'update']);
         
-        Route::delete('companies/{id}/employees/{employee}/delete', [EmployeeController::class, 'destroy'])
+        Route::delete('companies/{id}/employees/{employeeId}/delete', [EmployeeController::class, 'destroy'])
             ->name('employees.destroy');
     });
 });
