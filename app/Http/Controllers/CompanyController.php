@@ -28,7 +28,7 @@ class CompanyController extends Controller
     public function create()
     {
         // Logic to show the form for creating a new company
-        
+        return view('create-company');
     }
 
     /**
@@ -37,6 +37,13 @@ class CompanyController extends Controller
     public function store(StoreCompanyRequest $request)
     {
         // Logic to store a new company
+        $company = $this->companyService->createCompany($request);
+
+        if (isset($company['error'])) {
+            return redirect()->back()->withErrors($company['error']);
+        }
+
+        return redirect()->route('companies.index')->with('success', $company['message']);
     }
 
     /**
