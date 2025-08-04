@@ -3,6 +3,8 @@
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
+use App\Models\Company;
+use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
 
 //Route::get('/', function () {
@@ -13,7 +15,13 @@ Route::redirect('/', '/dashboard');
 
 Route::group(['middleware' => ['auth', 'verified']], function () {
 	Route::get('/dashboard', function () {
-		return view('dashboard');
+		$companies = Company::all();
+		$employees = Employee::all();
+
+		return view('dashboard', [
+			'companies' => $companies,
+			'employees' => $employees,
+		]);
 	})->name('dashboard');
 
 	Route::group(['prefix' => 'companies'], function () {
