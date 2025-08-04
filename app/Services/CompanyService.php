@@ -18,11 +18,11 @@ class CompanyService
             'employees:id,company_id,phone,logo', 
             'employees.user:id,name'
         ])
-        ->select('id', 'user_id', 'description', 'logo')
+        ->select('user_id', 'description', 'logo')
         ->get()
         ->map(function ($company) {
             return [
-                'id' => $company->id,
+                'id' => $company->user_id,
                 'name' => $company->user->name,
                 'description' => $company->description,
                 'logo' => $company->logo,
@@ -76,11 +76,11 @@ class CompanyService
             'employees:id,company_id,phone,logo',
             'employees.user:id,name'
         ])
-        ->select('id', 'user_id', 'description', 'logo')
+        ->select('user_id', 'description', 'logo')
         ->findOrFail($id);
 
         return [
-            'id' => $company->id,
+            'id' => $company->user_id,
             'name' => $company->user->name,
             'description' => $company->description,
             'logo' => $company->logo,

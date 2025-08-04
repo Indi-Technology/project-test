@@ -27,7 +27,6 @@ class CompanyController extends Controller
      */
     public function create()
     {
-        // Logic to show the form for creating a new company
         return view('create-company');
     }
 
@@ -36,7 +35,6 @@ class CompanyController extends Controller
      */
     public function store(StoreCompanyRequest $request)
     {
-        // Logic to store a new company
         $company = $this->companyService->createCompany($request);
 
         if (isset($company['error'])) {
@@ -51,7 +49,6 @@ class CompanyController extends Controller
      */
     public function show($id)
     {
-        // Logic to display a specific company
         $company = $this->companyService->getCompanyById($id);
         return view('show-company', compact('company'));
     }
@@ -61,7 +58,8 @@ class CompanyController extends Controller
      */
     public function edit($id)
     {
-        // Logic to show the form for editing a specific company
+        $company = $this->companyService->getCompanyById($id);
+        return view('edit-company', compact('company'));
     }
 
     /**
