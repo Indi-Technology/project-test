@@ -12,10 +12,8 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('employees', function (Blueprint $table) {
-            $table->uuid('id')->primary();
-            $table->foreign('company_id')->references('id')->on('companies')->onDelete('cascade');
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('company_id')->references('user_id')->on('companies')->onDelete('cascade');
             $table->string('phone');
             $table->string('logo')->nullable();
             $table->timestamps();
