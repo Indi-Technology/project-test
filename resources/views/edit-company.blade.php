@@ -9,7 +9,7 @@
 <body>
     <div class="container">
         <div class="back-link">
-            <a href="{{ route('companies.show', $company->id) }}">&larr; Back to Company Details</a>
+            <a href="{{ route('companies.show', $company['id']) }}">&larr; Back to Company Details</a>
         </div>
 
         <h1>Edit Company: {{ $company['name'] }}</h1>
@@ -24,7 +24,7 @@
             </div>
         @endif
 
-        <form action="{{ route('companies.update', $company->id) }}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('companies.update', $company['id']) }}" method="POST" enctype="multipart/form-data">
             @csrf
             @method('PUT')
             
@@ -68,7 +68,7 @@
 
             <div class="form-actions">
                 <button type="submit" class="btn btn-primary">Update Company</button>
-                <a href="{{ route('companies.show', $company->id) }}" class="btn btn-secondary">Cancel</a>
+                <a href="{{ route('companies.show', $company['id']) }}" class="btn btn-secondary">Cancel</a>
             </div>
         </form>
     </div>
