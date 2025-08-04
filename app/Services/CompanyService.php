@@ -94,9 +94,24 @@ class CompanyService
         ];
     }
 
-    public function updateCompany(int $id, array $data)
+    public function updateCompany(string $id, array $data)
     {
-        // Logic to update an existing company
+        try {
+            return DB::transaction(function () use ($id, $data) {
+                $company = Company::findOrFail($id);
+                $company->update($data);
+
+                return [
+                    'name' => $company->user->name,
+                    'message' => 'Company updated successfully'
+                ];
+            });
+        } catch (\Exception $e) {
+            // Handle the exception
+            return [
+                'error' => 'Failed to update company: ' . $e->getMessage()
+            ];
+        }
     }
 
     public function deleteCompany(int $id)

@@ -67,7 +67,13 @@ class CompanyController extends Controller
      */
     public function update(Request $request, $id)
     {
-        // Logic to update a specific company
+        $company = $this->companyService->updateCompany($id, $request->all());
+
+        if (isset($company['error'])) {
+            return redirect()->back()->withErrors($company['error']);
+        }
+
+        return redirect()->route('companies.index')->with('success', 'Company updated successfully');
     }
 
     /**
