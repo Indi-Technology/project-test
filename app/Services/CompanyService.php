@@ -71,7 +71,7 @@ class CompanyService
     public function getCompanyById(string $id)
     {
         $company = Company::with([
-            'user:id,name',
+            'user:id,name,email',
             'employees:user_id,company_id,phone,logo',
             'employees.user:id,name'
         ])
@@ -81,6 +81,7 @@ class CompanyService
         return [
             'id' => $company->user_id,
             'name' => $company->user->name,
+            'email' => $company->user->email,
             'description' => $company->description,
             'logo' => $company->logo,
             'employees' => $company->employees->map(function ($employee) {
