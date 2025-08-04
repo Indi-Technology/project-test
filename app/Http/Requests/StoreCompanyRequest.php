@@ -11,7 +11,7 @@ class StoreCompanyRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return false;
+        return true; // Allow all users to create companies
     }
 
     /**
@@ -22,8 +22,11 @@ class StoreCompanyRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'name' => ['required', 'string', 'max:255'],
+            'email' => ['required', 'email', 'unique:users,email'],
+            'password' => ['required', 'string', 'min:8', 'confirmed'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'logo' => ['nullable', 'image', 'max:2048'],
+            'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
         ];
     }
 
@@ -35,10 +38,18 @@ class StoreCompanyRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'string' => ':attributes must be a string.',
-            'image' => ':attributes must be a valid image file.',
-            'max.image' => ':attributes may not be greater than 2MB.',
-            'max.string' => ':attributes may not be greater than 1000 characters.',
+            'name.required' => 'Company name is required.',
+            'name.max' => 'Company name may not be greater than 255 characters.',
+            'email.required' => 'Email address is required.',
+            'email.email' => 'Email must be a valid email address.',
+            'email.unique' => 'This email address is already taken.',
+            'password.required' => 'Password is required.',
+            'password.min' => 'Password must be at least 8 characters.',
+            'password.confirmed' => 'Password confirmation does not match.',
+            'description.max' => 'Description may not be greater than 1000 characters.',
+            'logo.image' => 'Logo must be a valid image file.',
+            'logo.mimes' => 'Logo must be a file of type: jpeg, png, jpg, gif.',
+            'logo.max' => 'Logo may not be greater than 2MB.',
         ];
     }
 
@@ -50,6 +61,9 @@ class StoreCompanyRequest extends FormRequest
     public function attributes(): array
     {
         return [
+            'name' => 'Company Name',
+            'email' => 'Email Address',
+            'password' => 'Password',
             'description' => 'Company Description',
             'logo' => 'Company Logo',
         ];
