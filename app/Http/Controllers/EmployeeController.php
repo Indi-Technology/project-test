@@ -99,7 +99,16 @@ class EmployeeController extends Controller
      */
     public function update(Request $request, $companyId, $employeeId)
     {
-        $result = $this->employeeService->updateEmployee($employeeId, $request->all(), $companyId);
+        // Validasi hanya phone dan logo
+        $request->validate([
+            'phone' => ['nullable', 'string', 'max:20'],
+            'logo'  => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif', 'max:2048'],
+        ]);
+
+        // Hanya ambil phone dan logo dari request
+        $data = $request->only(['phone', 'logo']);
+        
+        $result = $this->employeeService->updateEmployee($employeeId, $data, $companyId);
         
         if (isset($result['error'])) {
             return redirect()->back()->withErrors($result['error']);

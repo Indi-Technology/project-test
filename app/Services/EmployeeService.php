@@ -6,6 +6,7 @@ use App\Models\Employee;
 use App\Models\User;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 
 class EmployeeService
 {
@@ -14,16 +15,14 @@ class EmployeeService
      */
     public function getAllEmployees(string $companyId)
     {
-        // Eager loading with pagination (10 entries per page)
         $employees = Employee::with([
             'user:id,name,email', 
             'company:user_id,description,logo'
         ])
         ->select('user_id', 'company_id', 'phone', 'logo')
         ->where('company_id', $companyId)
-        ->paginate(10); // Using paginate() instead of get()
+        ->paginate(10); 
 
-        // Transform data using getCollection() for pagination
         $employees->getCollection()->transform(function ($employee) {
             return [
                 'id' => $employee->user_id,
@@ -92,5 +91,43 @@ class EmployeeService
             'company_name' => $employee->company->user->name ?? 'No Company',
             'company_id' => $employee->company_id
         ];
+    }
+
+    /**
+     * Update employee dengan validasi company - hanya phone dan logo
+     */
+    public function updateEmployee($id, $data, $companyId)
+    {
+        try {
+            return DB::transaction(function () use ($id, $data, $companyId) {
+                $employee = Employee::where('user_id', $id)
+                    ->where('company_id', $companyId)
+                    ->firstOrFail();
+
+                $employeeData = [
+                    'phone' => $data['phone'] ?? $employee->phone,
+                ];
+
+                if (isset($data['logo']) && $data['logo']) {
+                    if ($employee->logo) {
+                        Storage::disk('public')->delete($employee->logo);
+                    }
+                    
+                    $employeeData['logo'] = $data['logo']->store('employee-photos', 'public');
+                } else {
+                    $employeeData['logo'] = $employee->logo;
+                }
+
+                $employee->update($employeeData);
+
+                return [
+                    'message' => 'Employee updated successfully'
+                ];
+            });
+        } catch (\Exception $e) {
+            return [
+                'error' => 'Failed to update employee: ' . $e->getMessage()
+            ];
+        }
     }
 }

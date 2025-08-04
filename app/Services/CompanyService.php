@@ -13,23 +13,21 @@ class CompanyService
      */
     public function getAllCompanies()
     {
-        // Eager loading dengan pagination (10 entries per page)
         $companies = Company::with([
             'user:id,name', 
             'employees:user_id,company_id,phone,logo', 
             'employees.user:id,name'
         ])
         ->select('user_id', 'description', 'logo')
-        ->paginate(10); // Menggunakan paginate() instead of get()
+        ->paginate(10); 
 
-        // Transform data menggunakan getCollection() untuk pagination
         $companies->getCollection()->transform(function ($company) {
             return [
                 'id' => $company->user_id,
                 'name' => $company->user->name,
                 'description' => $company->description,
                 'logo' => $company->logo,
-                'employees_count' => $company->employees->count(), // Hanya count, bukan list lengkap
+                'employees_count' => $company->employees->count(),
             ];
         });
         
@@ -58,7 +56,6 @@ class CompanyService
                 ];
             });
         } catch (\Exception $e) {
-            // Handle the exception
             return [
                 'error' => 'Failed to create company: ' . $e->getMessage()
             ];
@@ -86,13 +83,11 @@ class CompanyService
             ->select('user_id', 'description', 'logo')
             ->findOrFail($id);
 
-        // Pagination untuk employees
         $employees = $company->employees()
             ->with('user:id,name')
             ->select('user_id', 'company_id', 'phone', 'logo')
             ->paginate($perPage);
 
-        // Transform employees data
         $employees->getCollection()->transform(function ($employee) {
             return [
                 'id' => $employee->user_id,
@@ -120,13 +115,11 @@ class CompanyService
             return DB::transaction(function () use ($id, $data) {
                 $company = Company::where('user_id', $id)->firstOrFail();
                 
-                // Update company data
                 $company->update([
                     'description' => $data['description'] ?? $company->description,
                     'logo' => $data['logo'] ?? $company->logo,
                 ]);
 
-                // Update user data jika ada
                 if (isset($data['name'])) {
                     $company->user->update(['name' => $data['name']]);
                 }
@@ -148,13 +141,10 @@ class CompanyService
             return DB::transaction(function () use ($id) {
                 $company = Company::where('user_id', $id)->firstOrFail();
                 
-                // Delete all employees first
                 $company->employees()->delete();
                 
-                // Delete company
                 $company->delete();
                 
-                // Delete user
                 $company->user->delete();
 
                 return [
