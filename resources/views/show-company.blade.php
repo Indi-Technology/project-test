@@ -12,14 +12,14 @@
             <a href="{{ route('companies.index') }}">&larr; Back to Companies List</a>
         </div>
 
-        <div class="company-header">
+        <div class="company-header flex justify-center items-center bg-blue-500 p-4">
             @if($company['logo'])
                 <img src="{{ asset('storage/' . $company['logo']) }}" alt="Company Logo" class="company-logo">
             @endif
-            <h1 class="company-name">{{ $company->user->name ?? 'No Name' }}</h1>
+            <h1 class="company-name text-white">{{ $company['name'] ?? 'No Name' }}</h1>
         </div>
 
-        <div class="info-section">
+        <div class="info-section flex justify-center items-center">
             <h2 class="info-title">Company Information</h2>
             
             <div class="info-item">
