@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Company;
+use App\Models\User;
+use App\Notifications\CompanyRegistered;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -37,34 +39,37 @@ class CompanyController extends Controller
 	public function store(Request $request)
 	{
 		try {
-			$validated = $request->validate([
-				'name'        => ['required', 'string', 'max:255'],
-				'email'       => ['required', 'string', 'email', 'max:255', 'unique:companies,email'],
-				'logo'        => [
-					'nullable',
-					'image',
-					'max:2048',
-					Rule::dimensions()->minWidth(100)->minHeight(100)
-				],
-				'description' => ['nullable', 'string'],
-			], [
-				'name.required'   => 'Name is required.',
-				'email.required'  => 'Email is required.',
-				'email.email'     => 'Email must be a valid email address.',
-				'email.unique'    => 'Email has already been taken.',
-				'logo.image'      => 'Logo must be an image file.',
-				'logo.max'        => 'Logo size must not exceed 2MB.',
-				'logo.dimensions' => 'Logo must be at least 100x100 pixels.'
-			]);
+			DB::transaction(function () use ($request) {
+				$validated = $request->validate([
+					'name'        => ['required', 'string', 'max:255'],
+					'email'       => ['required', 'string', 'email', 'max:255', 'unique:companies,email'],
+					'logo'        => [
+						'nullable',
+						'image',
+						'max:2048',
+						Rule::dimensions()->minWidth(100)->minHeight(100)
+					],
+					'description' => ['nullable', 'string'],
+				], [
+					'name.required'   => 'Name is required.',
+					'email.required'  => 'Email is required.',
+					'email.email'     => 'Email must be a valid email address.',
+					'email.unique'    => 'Email has already been taken.',
+					'logo.image'      => 'Logo must be an image file.',
+					'logo.max'        => 'Logo size must not exceed 2MB.',
+					'logo.dimensions' => 'Logo must be at least 100x100 pixels.'
+				]);
 
-			if ($request->hasFile('logo')) {
-				$logoPath = $request->file('logo')->store('logo', 'public');
-				$validated['logo'] = $logoPath;
-			}
+				if ($request->hasFile('logo')) {
+					$logoPath = $request->file('logo')->store('logo', 'public');
+					$validated['logo'] = $logoPath;
+				}
 
-			Company::create($validated);
+				$company = Company::create($validated);
 
-			session()->forget('uploaded_logo_path');
+				$admin = User::first();
+				$admin->notify(new CompanyRegistered($company));
+			});
 
 			return redirect()->route('companies')->with('success', 'Company created successfully.');
 		} catch (ValidationException $e) {
