@@ -53,6 +53,22 @@
 				</label>
 
 				<label class="block">
+					<span class="block text-sm font-medium text-slate-400">Password <span class="text-red-500">*</span></span>
+					<div class="flex gap-3">
+						<div class="relative w-full flex items-center">
+							<input id="password" name="password" type="password" required placeholder="********" value="{{ old('password') }}" class="peer mt-1 block w-full px-3 py-2 bg-slate-300 focus:bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none">
+							<p class="absolute end-3" id="view">👁️</p>
+						</div>
+						<button type="button" id="generatePassword" class="items-center justify-center px-4 py-2 bg-blue-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-blue-500 active:bg-blue-600 focus:outline-none focus:border-blue-700 focus:ring ring-blue-200 disabled:opacity-25 transition ease-in-out duration-150">Generate</button>
+					</div>
+					@error('password')
+						<p class="mt-2 text-pink-600 text-sm">
+							{{ $message }}
+						</p>
+					@enderror
+				</label>
+
+				<label class="block">
 					<span class="block text-sm font-medium text-slate-400">Description</span>
 					<textarea rows="3" name="description" class="peer mt-1 block w-full px-3 py-2 bg-slate-300 focus:bg-white border border-slate-300 rounded-md text-sm shadow-sm placeholder-slate-400 focus:outline-none focus:border-sky-500 focus:ring-1 focus:ring-sky-500 disabled:bg-slate-50 disabled:text-slate-500 disabled:border-slate-200 disabled:shadow-none ">{{ old('description') }}</textarea>
 					@error('description')
@@ -71,6 +87,25 @@
 <script>
     const input = document.getElementById('logo-input');
     const preview = document.getElementById('logo-preview');
+
+	const generatePasswordButton = document.getElementById('generatePassword');
+	const passwordInput = document.getElementById('password');
+
+	const viewPassword = document.getElementById('view');
+	viewPassword.addEventListener('click', () => {
+		if (passwordInput.type === 'password') {
+			passwordInput.type = 'text';
+			viewPassword.textContent = '💀';
+		} else {
+			passwordInput.type = 'password';
+			viewPassword.textContent = '👁️';
+		}
+	});
+
+	generatePasswordButton.addEventListener('click', () => {
+		const randomPassword = Math.random().toString(36).slice(-8);
+		passwordInput.value = randomPassword; 
+	});
 
     input.addEventListener('change', (event) => {
         const file = event.target.files[0];

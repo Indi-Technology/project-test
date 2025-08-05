@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Company;
 use App\Models\Employee;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 
@@ -11,18 +12,27 @@ class EmployeeController extends Controller
 {
 	public function index(Request $request)
 	{
-		$companies = Company::all();
+		$companies = Company::query();
+		$employees = Employee::query();
+
+		if (Auth::user()->role != 'admin') {
+			$companies = $companies->where('user_id', Auth::user()->id);
+			$company = $companies->first();
+			$employees = $employees->where('company_id', $company->id);
+		}
+
+		$companies = $companies->get();
 
 		$search = $request->input('search');
 		$companySearch = $request->input('company');
 
 		if (!$search && !$companySearch) {
-			$employees = Employee::orderBy('created_at', 'desc')->paginate(10);
+			$employees = $employees->orderBy('created_at', 'desc')->paginate(10);
 
 			return view('employees.index', compact('employees', 'companies'));
 		}
 
-		$employees = Employee::where(function ($query) use ($search) {
+		$employees = $employees->where(function ($query) use ($search) {
 			$query->where('name', 'like', "%{$search}%")
 				->orWhere('email', 'like', "%{$search}%");
 		})
@@ -39,7 +49,14 @@ class EmployeeController extends Controller
 
 	public function create()
 	{
-		$companies = Company::all();
+		$companies = Company::query();
+
+		if (Auth::user()->role != 'admin') {
+			$companies = $companies->where('user_id', Auth::user()->id);
+		}
+
+		$companies = $companies->get();
+
 		return view('employees.create', compact('companies'));
 	}
 

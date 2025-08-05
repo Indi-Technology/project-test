@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Company;
 use App\Models\User;
 use App\Notifications\CompanyRegistered;
+use Auth;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use Illuminate\Support\Facades\DB;
@@ -17,13 +18,19 @@ class CompanyController extends Controller
 	{
 		$search = $request->input('search');
 
+		if (!Auth::user()->role == 'admin') {
+			$companies = Company::where('user_id', Auth::user()->id);
+		} else {
+			$companies = Company::query();
+		}
+
 		if (!$search) {
-			$companies = Company::orderBy('created_at', 'desc')->paginate(10);
+			$companies = $companies->orderBy('created_at', 'desc')->paginate(10);
 
 			return view('companies.index', compact('companies'));
 		}
 
-		$companies = Company::where('name', 'like', "%{$search}%")
+		$companies = $companies->where('name', 'like', "%{$search}%")
 			->orWhere('email', 'like', "%{$search}%")
 			->orderBy('created_at', 'desc')
 			->paginate(10);
@@ -49,23 +56,39 @@ class CompanyController extends Controller
 						'max:2048',
 						Rule::dimensions()->minWidth(100)->minHeight(100)
 					],
+					'password'    => ['required', 'string', 'min:8'],
 					'description' => ['nullable', 'string'],
 				], [
-					'name.required'   => 'Name is required.',
-					'email.required'  => 'Email is required.',
-					'email.email'     => 'Email must be a valid email address.',
-					'email.unique'    => 'Email has already been taken.',
-					'logo.image'      => 'Logo must be an image file.',
-					'logo.max'        => 'Logo size must not exceed 2MB.',
-					'logo.dimensions' => 'Logo must be at least 100x100 pixels.'
+					'name.required'      => 'Name is required.',
+					'email.required'     => 'Email is required.',
+					'email.email'        => 'Email must be a valid email address.',
+					'email.unique'       => 'Email has already been taken.',
+					'logo.image'         => 'Logo must be an image file.',
+					'logo.max'           => 'Logo size must not exceed 2MB.',
+					'logo.dimensions'    => 'Logo must be at least 100x100 pixels.',
+					'password.required'  => 'Password is required.',
+					'password.min'       => 'Password must be at least 8 characters.',
+					'description.string' => 'Description must be a string.',
 				]);
 
 				if ($request->hasFile('logo')) {
 					$logoPath = $request->file('logo')->store('logo', 'public');
-					$validated['logo'] = $logoPath;
 				}
 
-				$company = Company::create($validated);
+				$user = User::create([
+					'name'     => $validated['name'],
+					'email'    => $validated['email'],
+					'password' => bcrypt($validated['password']),
+					'role'     => 'user',
+				]);
+
+				$company = Company::create([
+					'name'        => $validated['name'],
+					'email'       => $validated['email'],
+					'logo'        => isset($logoPath) ? $logoPath : null,
+					'description' => $validated['description'],
+					'user_id'     => $user->id
+				]);
 
 				$admin = User::first();
 				$admin->notify(new CompanyRegistered($company));
@@ -140,6 +163,8 @@ class CompanyController extends Controller
 				$company->employees()->each(function ($employee) {
 					$employee->delete();
 				});
+
+				$company->user()->delete();
 
 				$company->delete();
 			});

@@ -3,6 +3,7 @@
 use App\Http\Controllers\CompanyController;
 use App\Http\Controllers\EmployeeController;
 use App\Http\Controllers\ProfileController;
+use App\Http\Middleware\CheckRole;
 use App\Models\Company;
 use App\Models\Employee;
 use Illuminate\Support\Facades\Route;
@@ -13,17 +14,17 @@ use Illuminate\Support\Facades\Route;
 
 Route::redirect('/', '/dashboard');
 
-Route::group(['middleware' => ['auth', 'verified']], function () {
-	Route::get('/dashboard', function () {
-		$companies = Company::all();
-		$employees = Employee::all();
+Route::get('/dashboard', function () {
+	$companies = Company::all();
+	$employees = Employee::all();
 
-		return view('dashboard', [
-			'companies' => $companies,
-			'employees' => $employees,
-		]);
-	})->name('dashboard');
+	return view('dashboard', [
+		'companies' => $companies,
+		'employees' => $employees,
+	]);
+})->name('dashboard')->middleware('auth');
 
+Route::middleware('role:admin')->group(function () {
 	Route::group(['prefix' => 'companies'], function () {
 		Route::get('/', [CompanyController::class, 'index'])->name('companies');
 
@@ -41,23 +42,23 @@ Route::group(['middleware' => ['auth', 'verified']], function () {
 
 		Route::put('/{company}/logo', [CompanyController::class, 'removeLogo'])->name('companies.removeLogo');
 	});
-
-	Route::group(['prefix' => 'employees'], function () {
-		Route::get('/', [EmployeeController::class, 'index'])->name('employees');
-
-		Route::get('/create', [EmployeeController::class, 'create'])->name('employees.create');
-
-		Route::post('/store', [EmployeeController::class, 'store'])->name('employees.store');
-
-		Route::get('/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
-
-		Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
-
-		Route::put('/{employee}/update', [EmployeeController::class, 'update'])->name('employees.update');
-
-		Route::delete('/{employee}/delete', [EmployeeController::class, 'destroy'])->name('employees.delete');
-	});
 });
+
+Route::group(['prefix' => 'employees'], function () {
+	Route::get('/', [EmployeeController::class, 'index'])->name('employees');
+
+	Route::get('/create', [EmployeeController::class, 'create'])->name('employees.create');
+
+	Route::post('/store', [EmployeeController::class, 'store'])->name('employees.store');
+
+	Route::get('/{employee}', [EmployeeController::class, 'show'])->name('employees.show');
+
+	Route::get('/{employee}/edit', [EmployeeController::class, 'edit'])->name('employees.edit');
+
+	Route::put('/{employee}/update', [EmployeeController::class, 'update'])->name('employees.update');
+
+	Route::delete('/{employee}/delete', [EmployeeController::class, 'destroy'])->name('employees.delete');
+})->middleware('auth');
 
 Route::middleware('auth')->group(function () {
 	Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');

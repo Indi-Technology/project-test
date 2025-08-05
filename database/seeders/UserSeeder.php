@@ -2,6 +2,7 @@
 
 namespace Database\Seeders;
 
+use App\Models\Company;
 use App\Models\User;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
@@ -18,6 +19,17 @@ class UserSeeder extends Seeder
 			'email'             => 'admin@admin.com',
 			'password'          => bcrypt('password'),
 			'email_verified_at' => now(),
+			'role'              => 'admin',
 		]);
+
+		for ($i = 1; $i <= 20; $i++) {
+			User::create([
+				'name'              => 'Company ' . $i,
+				'email'             => 'company' . $i . '@example.com',
+				'password'          => bcrypt('password'),
+				'email_verified_at' => now(),
+				'role'              => 'user',
+			]);
+		}
 	}
 }
