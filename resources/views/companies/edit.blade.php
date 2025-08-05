@@ -25,7 +25,7 @@
 				<div class="">
 					<div class="flex items-center space-x-6">
 						<div class="shrink-0 relative group h-16 w-16">
-							<img class="h-16 w-16 object-cover rounded-full"
+							<img id="logo-preview" class="h-16 w-16 object-cover rounded-full"
 								src="{{ $company->logo ? asset('storage/' . $company->logo) : 'https://ui-avatars.com/api/?name=' . $company->name . '&background=random&color=fff' }}"
 								alt="Company logo"
 							>
@@ -41,7 +41,7 @@
 							</div>
 						</div>
 						<label class="block w-full">
-							<input name="logo" type="file" accept="image/*" class="block w-full text-sm text-slate-500
+							<input id="logo-input" name="logo" type="file" accept="image/*" class="block w-full text-sm text-slate-500
 							file:mr-4 file:py-2 file:px-4
 							file:rounded-full file:border-0
 							file:text-sm file:font-semibold
@@ -106,6 +106,20 @@
 			form.action = `/companies/${companyId}/logo`;
 			form.submit();
 		}
+
+		const input = document.getElementById('logo-input');
+		const preview = document.getElementById('logo-preview');
+
+		input.addEventListener('change', (event) => {
+			const file = event.target.files[0];
+			if (file && file.type.startsWith('image/')) {
+				const reader = new FileReader();
+				reader.onload = e => {
+					preview.src = e.target.result;
+				};
+				reader.readAsDataURL(file);
+			}
+		});
 	</script>
 </x-app-layout>
 
